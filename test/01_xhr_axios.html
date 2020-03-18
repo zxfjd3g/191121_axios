@@ -22,7 +22,8 @@
         // url: 'http://localhost:3000/posts/1',
         method: 'GET',
         params: { // 指定所有query参数的对象(不是指定的params参数的)
-          id: 1
+          id: 1,
+          // title: 'xxx'
         }
       }).then(response => {
         console.log(response.data)
@@ -70,5 +71,6 @@
     }
 
   </script>
+
 </body>
 </html>

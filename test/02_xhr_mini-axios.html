@@ -12,5 +12,164 @@
   <button onclick="testPut()">发送PUT请求</button><br>
   <button onclick="testDelete()">发送Delete请求</button><br>
 
+  <script>
+    /* 
+    测试XHR的基本使用
+    */
+    function testXHR() {
+      // 1.创建XHR对象
+      const xhr = new XMLHttpRequest()
+      // 2.打开连接
+      xhr.open('GET', 'http://localhost:3000/posts', true)
+      // 3.绑定状态改变的监听, 并在异步回调中读取响应数据
+      xhr.onreadystatechange = function () {
+        // 如果请求还未完成, 直接结束
+        if (xhr.readyState!==4) {
+          return
+        }
+        const response = xhr.response
+        console.log(JSON.parse(response))
+      }
+      // 4.发送请求
+      xhr.send()
+    }
+    testXHR()
+  </script>
+
+  <script>
+
+    /* 
+    1.函数的返回值为promise, 成功的结果为response, 异常的结果为error
+    2.能处理多种类型的请求: GET/POST/PUT/DELETE
+    3.函数的参数为一个配置对象
+      {
+        url: '',   // 请求地址
+        method: '',   // 请求方式GET/POST/PUT/DELETE
+        params: {},  // GET/DELETE请求的query参数
+        data: {}, // POST或PUT请求的请求体参数 
+      }
+    4.响应json数据自动解析为js
+    */
+    function axios({// ES6: 解构参数对象 & 指定形参默认值
+      url,
+      method='GET',
+      params={}, // 对应生成query参数    
+      data={} // 对应生成请求体参数
+    }) { // 3.函数的参数为一个配置对象
+      // 1.函数的返回值为promise, 成功的结果为response, 异常的结果为error
+      return new Promise((resolve, reject) => {
+
+        // 将params中包含的所有数据拼接成url的query参数字符串
+        /* 
+        params: {id: 2, title='xxxx'}
+        url: http://localhost:3000/posts
+        生成带query参数的url: http://localhost:3000/posts?id=2&title=xxx
+        */
+        // 根据params对象生成query参数字符串id=2&title=xxx
+        let queryStr = ''
+        /* Object.keys(object): 得到对象自身上所有属性名的数组 */
+        Object.keys(params).forEach(key => {
+          queryStr += `&${key}=${params[key]}`
+        }) // &id=2&title=xxx
+        if (queryStr!=='') {
+          queryStr = queryStr.substring(1)  // id=2&title=xxx
+          // 将queryStr接到url上
+          url += '?' + queryStr // http://localhost:3000/posts?id=2&title=xxx
+        } 
+
+        // 发送异步ajax请求
+        const xhr = new XMLHttpRequest()
+        xhr.open(method, url, true)
+        xhr.onreadystatechange = function () {
+          // 如果请求未完成, 直接结束
+          if (xhr.readyState!==4) return
+          
+          const status = xhr.status // 响应状态码(数值)
+          // 如果请求成功(status在[200, 299])时执行resolve(response对象)
+          if (status>=200 && status<300) {
+            const data = xhr.response // 是一个json文本
+            const response = { // 封装一个response对象
+              data: JSON.parse(data),
+              status
+            }
+            resolve(response)
+          } else { // 如果请求失败时执行reject(error对象)
+            reject(new Error('request error, status is ' + status))
+          }
+        }
+        // 根据请求方式来决定要不要传请求体参数
+        if (method==='GET') {
+          xhr.send()
+        } else { // POST / PUT / DELETE
+          // xhr.send(data) // data此时不能对象
+          // 指定请求头: Content-Type: application/json;charset=utf-8
+          xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8')
+          xhr.send(JSON.stringify(data))
+        }
+      })
+    }
+
+    /* 只有GET请求不能指定请求体参数, 其它请求(POST/PUT/DELETE)可以指定query参数, params参数和请求参数 */
+  </script>
+
+  <script>
+    function testGet() {
+      axios({
+        url: 'http://localhost:3000/posts',
+        method: 'GET',
+        params: { // 指定所有query参数的对象(不是指定的params参数的)
+          id: 1,
+          // title: 'xxx'
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+    function testPost() {
+      axios({
+        url: 'http://localhost:3000/posts',
+        method: 'POST',
+        data: { // 指定所有请求参数的对象
+          title: 'title111',
+          author: 'author111'
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+    function testPut() {
+      axios({
+        url: 'http://localhost:3000/posts/5',
+        method: 'PUT',
+        data: { // 指定所有请求参数的对象
+          title: 'title333',
+          author: 'author333'
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+    function testDelete() {
+      axios({
+        url: 'http://localhost:3000/posts/5',
+        method: 'delete',
+        data: {
+          id: 1,
+          title: 2
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+
+  </script>
 </body>
 </html>
