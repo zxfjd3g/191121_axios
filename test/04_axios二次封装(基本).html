@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Axios二次封装</title>
+</head>
+<body>
+
+  <div>
+    <button onclick="getUsers()">获取用户列表</button>
+    <button onclick="getRepos()">获取仓库列表</button>
+  </div>
+  
+  <!-- 
+    测试接口1: https://api.github.com/search/repositories?q=v&sort=stars
+    测试接口1: https://api.github.com/search/users?q=v
+  -->
+  <!--
+   1). 统一进行请求配置: 基础路径/超时时间等
+   2). 请求过程中loading提示
+   3). 请求可能需要携带token数据
+   4). 请求成功的value不再是response, 而是response.data
+   5). 请求失败/出错统一进行处理, 每个请求可以不用单独处理
+  -->
+
+  <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
+  
+</body>
+</html>

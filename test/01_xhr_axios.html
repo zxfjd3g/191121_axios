@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>使用axios发ajax请求</title>
+</head>
+<body>
+  <button onclick="testGet()">发送GET请求</button><br>
+  <button onclick="testPost()">发送POST请求</button><br>
+  <button onclick="testPut()">发送PUT请求</button><br>
+  <button onclick="testDelete()">发送Delete请求</button><br>
+
+  <script src="https://cdn.bootcss.com/axios/0.19.2/axios.js"></script>
+
+  <script>
+    function testGet() {
+      axios({
+        url: 'http://localhost:3000/posts',
+        // url: 'http://localhost:3000/posts2',
+        // url: 'http://localhost:3000/posts/1',
+        method: 'GET',
+        params: { // 指定所有query参数的对象(不是指定的params参数的)
+          id: 1
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+    function testPost() {
+      axios({
+        url: 'http://localhost:3000/posts',
+        method: 'POST',
+        data: { // 指定所有请求参数的对象
+          title: 'title111',
+          author: 'author111'
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+    function testPut() {
+      axios({
+        url: 'http://localhost:3000/posts/5',
+        method: 'PUT',
+        data: { // 指定所有请求参数的对象
+          title: 'title222',
+          author: 'author222'
+        }
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+    function testDelete() {
+      axios({
+        url: 'http://localhost:3000/posts/5',
+        method: 'delete',
+      }).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        console.log('请求出错 ', error.message)
+      })
+    }
+
+  </script>
+</body>
+</html>
