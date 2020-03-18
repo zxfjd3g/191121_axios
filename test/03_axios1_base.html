@@ -8,11 +8,108 @@
 </head>
 <body>
   
-    <div>
-      <button onclick="testGet()">GET请求</button>
-      <button onclick="testPost()">POST请求</button>
-      <button onclick="testPut()">PUT请求</button>
-      <button onclick="testDelete()">DELETE请求</button>
-    </div>
+  <div>
+    <button onclick="testGet()">GET请求</button>
+    <button onclick="testPost()">POST请求</button>
+    <button onclick="testPut()">PUT请求</button>
+    <button onclick="testDelete()">DELETE请求</button>
+  </div>
+
+  <script src="https://cdn.bootcss.com/axios/0.19.2/axios.js"></script>
+  <script>
+
+    // 指定默认配置
+    axios.defaults.baseURL = 'http://localhost:3000'  // 基础路径
+
+    function testGet() {
+      /* axios({
+        url: 'http://localhost:3000/posts',
+        // method: 'GET',
+        params: {
+          id: 1
+        }
+      }) */
+      /* axios('http://localhost:3000/posts', {
+        // method: 'GET',
+        params: {
+          id: 3
+        }
+      }) */
+      axios.get('/posts', {
+        params: {
+          id: 3
+        }
+      })
+      
+      .then(response => {
+        const result = response.data
+        console.log('get()', result)
+      }).catch(error => {
+        alert(error.message)
+      })
+    }
+
+    function testPost() {
+      /* axios({
+        url: '/posts',
+        method: 'post',
+        data: {
+          title: 'title888',
+          author: 'yyyy'
+        }
+      }) */
+
+      axios.post('/posts', {
+        title: 'title9999',
+          author: 'yyyy9999'
+      })
+      .then(response => {
+        const result = response.data
+        console.log('post()', result)
+      }).catch(error => {
+        alert(error.message)
+      })
+    }
+
+    function testPut() {
+      axios({
+        url: '/posts/1',
+        method: 'put',
+        data: {
+          title: 'title888',
+          author: 'yyyy'
+        }
+      })
+
+      /* axios.put('/posts/1', {
+        title: 'title9999',
+          author: 'yyyy9999'
+      }) */
+      .then(response => {
+        const result = response.data
+        console.log('put()', result)
+      }).catch(error => {
+        alert(error.message)
+      })
+    }
+
+
+    function testDelete() {
+      /* axios({
+        url: '/posts/1',
+        method: 'delete'
+      }) */
+
+      axios.delete('/posts/3')
+      .then(response => {
+        const result = response.data
+        console.log('delete()', result)
+      }).catch(error => {
+        alert(error.message)
+      })
+    }
+
+  </script>
+
 </body>
 </html>

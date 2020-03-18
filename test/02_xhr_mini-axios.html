@@ -79,6 +79,8 @@
 
         // 发送异步ajax请求
         const xhr = new XMLHttpRequest()
+          // 2.能处理多种类型的请求: GET/POST/PUT/DELETE
+        method = method.toUpperCase() // 请求方式大写处理
         xhr.open(method, url, true)
         xhr.onreadystatechange = function () {
           // 如果请求未完成, 直接结束
@@ -89,7 +91,7 @@
           if (status>=200 && status<300) {
             const data = xhr.response // 是一个json文本
             const response = { // 封装一个response对象
-              data: JSON.parse(data),
+              data: JSON.parse(data), // 4.响应json数据自动解析为js
               status
             }
             resolve(response)
@@ -116,7 +118,7 @@
     function testGet() {
       axios({
         url: 'http://localhost:3000/posts',
-        method: 'GET',
+        method: 'get',
         params: { // 指定所有query参数的对象(不是指定的params参数的)
           id: 1,
           // title: 'xxx'
