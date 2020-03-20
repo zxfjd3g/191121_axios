@@ -21,7 +21,7 @@
   <!--
    1). 统一进行请求配置: 基础路径/超时时间等
    2). 请求过程中loading提示
-   3). 请求可能需要携带token数据
+   3). 请求可能需要携带token数据(后台返回给前台的身份标识字符串)
    4). 请求成功的value不再是response, 而是response.data
    5). 请求失败/出错统一进行处理, 每个请求可以不用单独处理
   -->
@@ -38,19 +38,37 @@
     axios.interceptors.request.use((config) => {
       // 2). 请求过程中loading提示: 显示
       NProgress.start()
+
+      // 3). 请求可能需要携带token数据(后台返回给前台的身份标识字符串)
+      const token = 'abcd' // 浏览器端保存的token
+      if (token) { // 如果有值, 通过请求头来自动携带token数据
+        // config.headers['token'] = token  // 属性名是接口文档指定的
+        config.headers.Authorization = token
+      }
+
       return config
     })
     // 添加响应拦截器
     axios.interceptors.response.use((response) => {
       // 2). 请求过程中loading提示: 隐藏
       NProgress.done()
-      
-      return response
+      // 4). 请求成功的value不再是response, 而是response.data
+      // return response
+      return response.data
     }, error => {
       // 2). 请求过程中loading提示: 隐藏
       NProgress.done()
 
-      return Promise.reject(error)
+      // 5). 请求失败/出错统一进行处理, 每个请求可以不用单独处理
+      alert('请求出错: ' + error.message)
+
+      // 可能性1: 将错误传递给链的下一级
+      // return Promise.reject(error)  // 返回一个失败的promise
+      // throw error  // 也可以将错误向下传递
+      // return error // 不会传递错误
+      
+      // 可能性2: 后面的请求完全不用再处理错误
+      return new Promise(() => {})  // 返回pending状态promise ==> 中断promise链
     })
 
 
@@ -69,8 +87,8 @@
       axios.get('/search/users', {
         params: { q: 'v'}
       })
-        .then(response => {
-          console.table(response.data)
+        .then(result => {
+          console.table(result)
         })
         .catch(error => {
           alert('请求用户列表出错 ' + error.message)
@@ -84,8 +102,8 @@
           'sort': 'stars'
         }
       })
-        .then(response => {
-          console.log(response.data)
+        .then(data => {
+          console.log(data)
         })
         .catch(error => {
           alert('请求仓库列表出错 ' + error.message)
