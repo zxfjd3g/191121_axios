@@ -13,7 +13,52 @@
 
   <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
   <script>
-    
+    /* 
+    1. 配置cancelToken对象, 指定用于接收取消请求函数的回调函数
+    2. 将接收到cancel函数(用于取消当前即将发出的请求)保存起来
+    3. 在请求结束前, 通过调用保存的cancel函数取消未完成的请求
+    4. 在请求完成的回调中, 将cancel函数重置
+    */
+
+    axios.defaults.baseURL = 'http://localhost:4000'
+    let axiosCancel
+
+    function getProducts1() {
+      axios.get('/products1', {
+        cancelToken: new axios.CancelToken((cancel) => {  //在真正发请求前立即调用
+          axiosCancel = cancel
+        })
+      }).then(response => { // 在请求完成后, 重置axiosCancel
+        axiosCancel = null
+        console.log('/products1 data: ', response.data)
+      }).catch(error => {
+        axiosCancel = null
+        console.log('/products1 error', error.message)
+      })
+    }
+    function getProducts2() {
+      axios.get('/products2', {
+        cancelToken: new axios.CancelToken((cancel) => {  //在真正发请求前立即调用
+          axiosCancel = cancel
+        })
+      }).then(response => {
+        axiosCancel = null
+        console.log('/products2 data: ', response.data)
+      }).catch(error => {
+        axiosCancel = null
+        console.log('/products2 error', error.message)
+      })
+    }
+
+    function cancelReq () {
+      // 只有当axiosCancel是函数, 才去取消请求
+      if (typeof axiosCancel==='function') {
+        console.log('取消请求')
+        axiosCancel('强制取消请求')
+      } else {
+        console.log('没有需要取消的请求')
+      }
+    }
   </script>
 </body>
 </html>
