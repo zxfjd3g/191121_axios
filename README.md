@@ -15,12 +15,12 @@
     2. 多个响应头: 如 Content-Type / Set-Cookie 头
     3. 响应体
 
-## 4. post请求体文本参数格式
+## 4. 请求体文本参数格式
     1. Content-Type: application/x-www-form-urlencoded;charset=utf-8
         用于键值对参数，参数的键值用=连接, 参数之间用&连接
         例如: name=%E5%B0%8F%E6%98%8E&age=12
     2. Content-Type: application/json;charset=utf-8
-        用于json字符串参数
+        用于json字符串参数   
         例如: {"name": "%E5%B0%8F%E6%98%8E", "age": 12}
 
 ## 5. 常见响应状态码
@@ -71,7 +71,7 @@
     浏览器端/node端都可以使用
     支持请求／响应拦截器
     支持请求取消
-    请求/响应数据转换
+    请求/响应数据转换   
     批量发送多个请求
 
 ## 12. axios常用语法
@@ -92,6 +92,7 @@
     axios.Cancel(): 用于创建取消请求的错误对象
     axios.CancelToken(): 用于创建取消请求的token对象
     axios.isCancel(): 是否是一个取消请求的错误
+    
     axios.all(promises): 用于批量执行多个异步请求
     axios.spread(): 用来指定接收所有成功数据的回调函数的方法
 

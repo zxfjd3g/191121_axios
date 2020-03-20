@@ -18,12 +18,13 @@
   <script src="https://cdn.bootcss.com/axios/0.19.2/axios.js"></script>
   <script>
 
-    // 指定默认配置
+    // 指定默认全局配置
     axios.defaults.baseURL = 'http://localhost:3000'  // 基础路径
 
     function testGet() {
       /* axios({
-        url: 'http://localhost:3000/posts',
+        // url: 'http://localhost:3000/posts',
+        url: '/posts',
         // method: 'GET',
         params: {
           id: 1

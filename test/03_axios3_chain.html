@@ -10,7 +10,93 @@
   
   <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
   <script>
-   
+
+    // 添加请求拦截器
+    axios.interceptors.request.use(function (config) {
+      console.log('请求拦截器1111的成功回调')
+      
+      return config; // 必须返回config(描述请求相关数据的配置对象)
+    });
+
+    axios.interceptors.request.use(function (config) {
+      console.log('请求拦截器2222的成功回调')
+      
+      return config; // 必须返回config(描述请求相关数据的配置对象)
+    });
+
+    // 添加响应拦截器
+    axios.interceptors.response.use(function (response) {
+      console.log('响应拦截器1111的成功回调', response.data)
+      return response; // 默认返回response, 也可以改为返回其它数据
+      // return response.data // 返回的数据会交给外层的成功回调
+    }, function (error) {
+      console.log('响应拦截器1111的失败回调')
+      return Promise.reject(error);
+    });
+
+    axios.interceptors.response.use(function (response) {
+      console.log('响应拦截器2222的成功回调', response.data)
+      return response; // 默认返回response, 也可以改为返回其它数据
+      // return response.data // 返回的数据会交给外层的成功回调
+    }, function (error) {
+      console.log('响应拦截器2222的失败回调')
+      return Promise.reject(error);
+    });
+
+    axios.get('http://localhost:3000/posts')
+    // .then(response => { // response不再是response, 而是response.data
+    .then(response => { 
+      console.log('请求成功回调: ', response.data)
+    }, error => {
+      console.log('请求出错回调: ', error.message)
+    })
+
+    /* Promise的链式调用 */
+
+    /* 
+    模拟内部一个基本流程
+    const config = {url: '/xxx'}
+    Promise.resolve(config)
+      .then((config) => {  // 相当于请求拦截器
+        return config
+      })
+      .then((config) => { //内部发出ajax请求
+        console.log('发出ajax请求')
+        const response = {
+          data: 3
+        }
+        return response
+      })
+      .then((response) => { // 响应拦截器
+        
+        return response.data
+      })
+      .then((data) => { // 请求编码的回调
+        
+        return data
+      })
+ */
+
+    /* 
+    1. 请求/响应拦截器到底是什么?
+        成功/失败的回调函数
+    2. 请求拦截器什么时候调用?
+        在真正发出请求前执行
+    3. 响应拦截器什么时候调用?
+        在请求完成并返回后执行
+        在外层回调函数之前执行
+    
+    整体执行流程:
+      ==> 调用请求拦截器2  接收的是config , 传递的也必须是config
+      ==> 调用请求拦截器1  接收的是config , 传递的也必须是config
+      ==> 发出请求         根据config
+      => 得到响应          产生一个包含响应数据的response对象
+      ==> 调用响应拦截器1   接收的是response, 返回的默认是response, 也可以是response.data
+      ==> 调用响应拦截器2  默认接收是response(也可能是data), 返回response或者data
+      ==> 调用最外层的回调  默认接收是response(也可能是data)
+
+    内部如何实现整体流程的?    通过promise.then()的链式调用连接起来的
+    */
   </script>
 </body>
 </html>
