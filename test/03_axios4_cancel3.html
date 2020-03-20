@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>取消请求</title>
+</head>
+<body>
+  <button onclick="getProducts1()">获取商品列表1</button><br>
+  <button onclick="getProducts2()">获取商品列表2</button><br>
+
+  <!-- 
+    需求: 当发出一个新的请求时同, 如果上一个请求还未完成, 直接取消 
+  
+    问题: 在发第3个请求前, 没有成功的将第2个请求取消掉
+
+    发请求1   保存请求1对应的axiosCancel  ===> 发出异步请求1 ...
+    发请求2   
+        执行取消请求1的axiosCancel() ==> 请求1的失败的回调函数异步执行(放入微队列)
+        保存请求2对应的axiosCancel  ==> 发出异步请求2...
+        请求1的失败回调函数执行 ==> axiosCancel = null 使用于取消请求2的axiosCancel2被置null
+    发请求3
+        发现请求2的axiosCancel为null(其实请求2并没有完成)
+  -->
+
+  <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
+  <script>
+    /* 
+    1. 配置cancelToken对象, 指定用于接收取消请求函数的回调函数
+    2. 将接收到cancel函数(用于取消当前即将发出的请求)保存起来
+    3. 在请求结束前, 通过调用保存的cancel函数取消未完成的请求
+    4. 在请求完成的回调中, 将cancel函数重置
+    */
+
+    axios.defaults.baseURL = 'http://localhost:4000'
+    let axiosCancel
+
+    // 添加请求拦截器
+    axios.interceptors.request.use((config) => {
+      // 如果axiosCancel有值, 取消未完成请求
+      if (typeof axiosCancel === 'function') {
+        axiosCancel('强制取消请求')
+      }
+
+      // 添加cancelToken的配置
+      config.cancelToken = new axios.CancelToken((cancel) => {  //在真正发请求前立即调用
+        axiosCancel = cancel
+      })
+
+      return config
+    })
+
+    // 添加响应拦截器
+    axios.interceptors.response.use(
+      response => {
+        axiosCancel = null
+        return response
+      },
+      error => {
+        if (axios.isCancel(error)) { // 取消请求出错
+          // axiosCancel = null  // 因为取消请求的失败不去做
+          return new Promise(() => {})
+        } else { // 请求出错
+          axiosCancel = null
+          return Promise.reject(error)
+        }
+      }
+    )
+
+
+    function getProducts1() {
+      axios.get('/products1').then(response => { // 在请求完成后, 重置axiosCancel
+        console.log('/products1 data: ', response.data)
+      }).catch(error => {
+        console.log('/products1 error', error.message)
+      })
+    }
+    function getProducts2() {
+      axios.get('/products2').then(response => {
+        console.log('/products2 data: ', response.data)
+      }).catch(error => {
+        console.log('/products2 error', error.message)
+      })
+    }
+
+    /*  */
+  </script>
+</body>
+</html>
