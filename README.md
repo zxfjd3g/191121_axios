@@ -96,15 +96,23 @@
     axios.all(promises): 用于批量执行多个异步请求
     axios.spread(): 用来指定接收所有成功数据的回调函数的方法
 
-## 13. 源码难点与流程分析
+## 13 axios二次封装
+    1.统一进行请求配置: 基础路径/超时时间等
+    2.请求过程中loading提示: 利用请求和响应拦截器
+    3.请求可能需要携带token数据: 利用请求拦截器向请求头中添加token
+    4.请求成功的value不再是response, 而是response.data: 利用响应拦截器的成功回调
+    5.请求失败/出错统一进行处理, 每个请求可以不用单独处理: 利用响应拦截器的失败回调
+
+## 14. 源码难点与流程分析
     1. axios与Axios的关系
         axios函数对应的是Axios.prototype.request方法通过bind(Axiox的实例)产生的函数
         axios有Axios原型上的所有发特定类型请求的方法: get()/post()/put()/delete()
         axios有Axios的实例上的所有属性: defaults/interceptors
         后面又添加了create()/CancelToken()/all()
-    2. axios.create()返回的对象与axios的区别
+        从语法来说: axios不是Axios的实例, 但从功能来说: axios是Axios的实例
+    2. axios.create()返回的instance与axios的区别
         1). 相同: 
-            都是一个能发任意请求的函数: request(config)
+            都是一个能发任意请求的函数: 内部执行request(config)
             都有发特定请求的各种方法: get()/post()/put()/delete()
             都有默认配置和拦截器的属性: defaults/interceptors
         2). 不同:
@@ -141,12 +149,4 @@
             request,
             response
         }
-    8. 如何取消未完成的请求
-        1).当配置了cancelToken对象时, 保存cancel函数
-            创建一个用于将来中断请求的cancelPromise
-            并定义了一个用于取消请求的cancel函数
-            将cancel函数传递出来
-        2.调用cancel()取消请求
-            执行cacel函数, 传入错误信息message
-            内部会让cancelPromise变为成功, 且成功的值为一个Cancel对象
-            在cancelPromise的成功回调中中断请求, 并让发请求的proimse失败, 失败的reason为Cacel对象
+
